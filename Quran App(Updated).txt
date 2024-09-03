@@ -1,0 +1,193 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:quran/quran.dart' as quran;
+import 'package:just_audio/just_audio.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const Splash(),
+    );
+  }
+}
+
+class Splash extends StatefulWidget {
+  const Splash({Key? key}) : super(key: key);
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    Timer(
+        Duration(seconds: 3),
+        () => {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => page(),
+                  ))
+            });
+    super.initState();
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        child: Image.asset("assets/images/quran.jpg",
+            height: double.infinity, width: double.infinity),
+      ),
+      backgroundColor: Color(0xff0b1628),
+    );
+  }
+}
+
+class page extends StatefulWidget {
+  const page({Key? key}) : super(key: key);
+
+  @override
+  State<page> createState() => _pageState();
+}
+
+class _pageState extends State<page> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView.builder(
+        itemBuilder: (context, index) {
+          return ListTile(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailSurah(index + 1),
+                  ));
+            },
+            leading: CircleAvatar(
+                backgroundColor: Color(0xff0c1427),
+                child: Text(
+                  "${index + 1}",
+                  style: TextStyle(color: Colors.white),
+                )),
+            title: Text(
+                quran.getSurahName(index + 1) +
+                    " | " +
+                    quran.getSurahNameArabic(index + 1),
+                style: GoogleFonts.amiriQuran()),
+            subtitle: Text(quran.getSurahNameEnglish(index + 1)),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                quran.getPlaceOfRevelation(index + 1) == 'Makkah'
+                    ? Image.asset('assets/images/Kaabah.png',
+                        width: 25, height: 25)
+                    : Image.asset('assets/images/Madinah.png',
+                        width: 25, height: 25),
+                Text(
+                  "Verses:" + quran.getVerseCount(index + 1).toString(),
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          );
+        },
+        itemCount: quran.totalSurahCount,
+      ),
+    );
+  }
+}
+
+class DetailSurah extends StatefulWidget {
+  var index;
+  DetailSurah(this.index, {super.key});
+
+  @override
+  State<DetailSurah> createState() => _DetailSurahState();
+}
+
+class _DetailSurahState extends State<DetailSurah> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          flexibleSpace: Column(children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 3.0),
+            ),
+            Center(
+              child: Text(quran.getSurahNameArabic(widget.index),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                  )),
+            ),
+            Center(
+              child: Text(quran.getSurahName(widget.index),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                  )),
+            ),
+            Center(
+              child: Text(quran.getSurahNameEnglish(widget.index),
+                  style: TextStyle(color: Colors.white, fontSize: 12)),
+            ),
+          ]),
+          backgroundColor: Color(0xff3e5a9d),
+        ),
+        body: Center(
+            child: ListView.builder(
+          itemCount: quran.getVerseCount(widget.index),
+          itemBuilder: (context, index) {
+            return Card(
+              margin: const EdgeInsets.all(8),
+              shape: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xffb1ccf9))),
+              child: ListTile(
+                title: Text(
+                  quran.getVerse(widget.index, index + 1, verseEndSymbol: true),
+                  style: GoogleFonts.amiriQuran(),
+                  textAlign: TextAlign.center,
+                ),
+                subtitle: Text(
+                  quran.getVerseTranslation(widget.index, index + 1),
+                  style: GoogleFonts.amiriQuran(),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          },
+        )),
+        bottomSheet: Container(
+            color: Color(0xffdde7ef),
+            height: 50,
+            width: double.infinity,
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Icon(Icons.play_circle_fill_rounded),
+              ),
+            )));
+  }
+}
